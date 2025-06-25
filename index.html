@@ -1,49 +1,64 @@
-<script>
-  function setRandomQuote(quotes) {
-    const el = document.getElementById("quote");
-    const random = quotes[Math.floor(Math.random() * quotes.length)];
-    if (el && random.text && random.author) {
-      el.innerText = `"${random.text}" - ${random.author}`;
-    }
-  }
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>오늘의 문장</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles/theme.css" />
+</head>
+<body>
 
-  window.addEventListener("DOMContentLoaded", () => {
-    let loadedQuotes = [];
-
-    // 1. layout.json 불러와서 block 렌더링
-    fetch('layout.json')
-      .then(res => res.json())
-      .then(blocks => {
-        blocks.forEach(b => {
-          if (b.enabled) {
-            fetch(`blocks/${b.block}.html`)
-              .then(res => res.text())
-              .then(html => {
-                const container = document.createElement("div");
-                container.innerHTML = html;
-                document.body.appendChild(container);
-
-                // quote가 들어간 블록이 렌더링된 후 랜덤 문장 삽입
-                if (b.block === "hero-banner" && loadedQuotes.length) {
-                  setRandomQuote(loadedQuotes);
-                }
-              });
-          }
-        });
-      });
-
-    // 2. quotes.json 불러오기
-    fetch('quotes.json')
-      .then(res => res.json())
-      .then(quotes => {
-        loadedQuotes = quotes;
-      });
-
-    // 3. 버튼 클릭 시 새로운 문장 표시
-    document.addEventListener("click", (e) => {
-      if (e.target.id === "refresh" && loadedQuotes.length) {
-        setRandomQuote(loadedQuotes);
+  <!-- 여기에 layout.json에서 정의된 블록들이 들어갑니다 -->
+  
+  <script>
+    function setRandomQuote(quotes) {
+      const el = document.getElementById("quote");
+      const random = quotes[Math.floor(Math.random() * quotes.length)];
+      if (el && random.text && random.author) {
+        el.innerText = `"${random.text}" - ${random.author}`;
       }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      let loadedQuotes = [];
+
+      // 1. layout.json 불러와서 block 렌더링
+      fetch('layout.json')
+        .then(res => res.json())
+        .then(blocks => {
+          blocks.forEach(b => {
+            if (b.enabled) {
+              fetch(`blocks/${b.block}.html`)
+                .then(res => res.text())
+                .then(html => {
+                  const container = document.createElement("div");
+                  container.innerHTML = html;
+                  document.body.appendChild(container);
+
+                  // hero-banner 블록 안에 quote 삽입
+                  if (b.block === "hero-banner" && loadedQuotes.length) {
+                    setRandomQuote(loadedQuotes);
+                  }
+                });
+            }
+          });
+        });
+
+      // 2. quotes.json 불러오기
+      fetch('quotes.json')
+        .then(res => res.json())
+        .then(quotes => {
+          loadedQuotes = quotes;
+        });
+
+      // 3. 버튼 클릭 시 새로운 문장 표시
+      document.addEventListener("click", (e) => {
+        if (e.target.id === "refresh" && loadedQuotes.length) {
+          setRandomQuote(loadedQuotes);
+        }
+      });
     });
-  });
-</script>
+  </script>
+
+</body>
+</html>
