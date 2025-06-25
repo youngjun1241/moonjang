@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,47 +5,52 @@
   <title>오늘의 문장</title>
   <link rel="stylesheet" href="styles/theme.css">
   <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    fetch('layout.json')
-      .then(res => res.json())
-      .then(blocks => {
-        blocks.forEach(b => {
-          if (b.enabled) {
-            fetch(`blocks/${b.block}.html`)
-              .then(res => res.text())
-              .then(html => {
-                const container = document.createElement("div");
-                container.innerHTML = html;
-                document.body.appendChild(container);
-              });
+    window.addEventListener('DOMContentLoaded', () => {
+      // 레이아웃 블록 불러오기
+      fetch('layout.json')
+        .then(res => res.json())
+        .then(blocks => {
+          blocks.forEach(b => {
+            if (b.enabled) {
+              fetch(`blocks/${b.block}.html`)
+                .then(res => res.text())
+                .then(html => {
+                  const container = document.createElement("div");
+                  container.innerHTML = html;
+                  document.body.appendChild(container);
+                });
+            }
+          });
+        });
+
+      // 랜덤 문장 표시
+      fetch('quotes.json')
+        .then(res => res.json())
+        .then(quotes => {
+          const random = quotes[Math.floor(Math.random() * quotes.length)];
+          const el = document.getElementById("quote");
+          if (el && random.text && random.author) {
+            el.innerText = `"${random.text}" - ${random.author}`;
           }
         });
-      });
 
-    fetch('quotes.json')
-      .then(res => res.json())
-      .then(quotes => {
-        const random = quotes[Math.floor(Math.random() * quotes.length)];
-        const el = document.getElementById("quote");
-        if (el && random.text && random.author) {
-          el.innerText = `"${random.text}" - ${random.author}`;
+      // 새 문장 보기 버튼
+      document.addEventListener('click', (e) => {
+        if (e.target.id === 'refresh') {
+          fetch('quotes.json')
+            .then(res => res.json())
+            .then(quotes => {
+              const random = quotes[Math.floor(Math.random() * quotes.length)];
+              const el = document.getElementById("quote");
+              if (el && random.text && random.author) {
+                el.innerText = `"${random.text}" - ${random.author}`;
+              }
+            });
         }
       });
-  });
-</script>
-
+    });
+  </script>
 </head>
 <body>
-  <main class="container">
-    <h1>오늘의 문장 플랫폼</h1>
-    
-    <div id="quote" class="quote-box">여기에 랜덤 문장이 표시됩니다</div>
-    
-    <button id="refresh">다른 문장 보기</button>
-
-    <footer>© 2025 오늘의 문장</footer>
-  </main>
 </body>
-
-
 </html>
